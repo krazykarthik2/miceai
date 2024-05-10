@@ -3,6 +3,7 @@ import track_hand as htm
 import time
 import pyautogui
 import cv2
+import urllib
 
 wCam, hCam = 1280, 720
 frameR = 200
@@ -20,11 +21,19 @@ wScr, hScr = pyautogui.size()
 isMouseDown = False
 
 
-def do_the_thing():
+def do_the_thing(url):
     global wCam,hCam,frameR,smoothening,cap,detector,wScr,hScr,isMouseDown,pTime,clocX,clocY,plocX,plocY
     while True:
         fingers = [0, 0, 0, 0, 0]
-        success, img = cap.read()
+        # success, img = cap.read()
+
+
+        img_resp=urllib.request.urlopen(url)
+        imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
+        img=cv2.imdecode(imgnp,-1)
+        
+
+
         img = detector.findHands(img)
         lmList, bbox = detector.findPosition(img)
         if len(lmList) != 0:

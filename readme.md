@@ -6,6 +6,10 @@
 - tkinter
 - pillow
 - mediapipe
-- autopy
-  - setuptools-rust
-  - rustup
+- pyautogui
+
+write the python
+
+create a init.bat file
+
+convert init.bat file to init.exe file using [advbattoexeconverter.exe](https://www.battoexeconverter.com/downloads/advbattoexeconverter.exe)

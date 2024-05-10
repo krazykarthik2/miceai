@@ -2,7 +2,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
+from test_code import do_the_thing
 
+
+def to_ip(values):
+    x = [str(int(y,16)) for y in values]
+    ip ='.'.join(x)
+    return 'http://'+ip+'/cam-hi.jpg'
 class HexValidator(QRegExpValidator):
     def __init__(self):
         super().__init__(QRegExp(r'^([0-9A-Fa-f]{0,2})?$'))
@@ -75,13 +81,20 @@ class App(QWidget):
         values = [entry.text().upper() for entry in self.entries]
         if all([x for x in values]):
             QMessageBox.information(self, 'Success', 'All values are valid hex: ' + ', '.join(values))
+            self.close()
+            ip = to_ip(values)
+            print(ip)
+            do_the_thing()
+            # do_the_thing(ip)
         else:
             QMessageBox.warning(self, 'Error', 'All are not valid hex\nEnter only valid hex')
+
     
     def close_grace(self):
         reply = QMessageBox.question(self, 'Exit?', 'Do you really want to exit???', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.close()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
