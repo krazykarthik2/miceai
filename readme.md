@@ -1,7 +1,7 @@
 # Dependencies
 
 - numpy
-- opencv
+- opencv-python
 - pyqt5
 - tkinter
 - pillow

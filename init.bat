@@ -1,3 +1,3 @@
 @echo off
-python main_new.py
+pythonw main_new.py
 exit

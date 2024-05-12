@@ -2,16 +2,20 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
-from test_code import do_the_thing
+import time
+import test_code as pack
 
 
 def to_ip(values):
     x = [str(int(y,16)) for y in values]
     ip ='.'.join(x)
     return 'http://'+ip+'/cam-hi.jpg'
+
 class HexValidator(QRegExpValidator):
     def __init__(self):
         super().__init__(QRegExp(r'^([0-9A-Fa-f]{0,2})?$'))
+
+
 def load_custom_font():
     # Load custom font
     fontId = QFontDatabase.addApplicationFont("assets/fonts/NeueMachina-Ultrabold.otf")
@@ -39,17 +43,26 @@ class App(QWidget):
         self.setStyleSheet('QWidget{ background:#000;color:#fff; }')
         
         self.center()
-        v_layout = QVBoxLayout()
+        self.v_layout = QVBoxLayout()
         # Setup the GIF animation
         self.gif_label = QLabel(self)
         self.movie = QMovie("assets/init.gif")
         self.gif_label.setMovie(self.movie)
         self.movie.start()
 
+        self.gif_label_small = QLabel(self)
+        self.movie_small = QMovie("assets/small.gif")
+        self.gif_label_small.setMovie(self.movie_small)
+        
+
+
+
+
+
         # Create line edits for hex input
         self.entries = []
 
-        h_layout = QHBoxLayout()
+        self.h_layout = QHBoxLayout()
         for i in range(4):
             entry = QLineEdit(self)
             entry.setValidator(HexValidator())
@@ -57,18 +70,22 @@ class App(QWidget):
             entry.setStyleSheet("outline:none;border:none;border-bottom:2px solid #fff;text-align:center;align-items:center;")
             entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.entries.append(entry)
-            h_layout.addWidget(entry)
+            self.h_layout.addWidget(entry)
         
         # Submit button
         self.submit_btn = QPushButton('Submit', self)
         self.submit_btn.clicked.connect(self.on_submit)
+        # Close button
+        self.close_btn = QPushButton('Terminate', self)
+        self.close_btn.clicked.connect(self.close_grace)
 
-        v_layout.addWidget(self.gif_label)
-        v_layout.addLayout(h_layout)
-        v_layout.addWidget(self.submit_btn)
+        self.v_layout.addWidget(self.gif_label)
+        self.v_layout.addLayout(self.h_layout)
+        self.v_layout.addWidget(self.submit_btn)
         
         # Set layout
-        self.setLayout(v_layout)
+        self.setLayout(self.v_layout)
+
 
         # Bind the return key to the submit function
         self.submit_btn.setShortcut("Return")
@@ -76,16 +93,32 @@ class App(QWidget):
         # Bind Ctrl+D to close the application
         self.shortcut_close = QShortcut(QKeySequence("Ctrl+D"), self)
         self.shortcut_close.activated.connect(self.close_grace)
-    
+        self.show()
+
     def on_submit(self):
         values = [entry.text().upper() for entry in self.entries]
         if all([x for x in values]):
-            QMessageBox.information(self, 'Success', 'All values are valid hex: ' + ', '.join(values))
-            self.close()
+            # QMessageBox.information(self, 'Success', 'All values are valid hex: ' + ', '.join(values))
+            
             ip = to_ip(values)
             print(ip)
-            do_the_thing()
+            
+            self.movie_small.start()
+            self.v_layout.addWidget(self.gif_label_small)
+            self.v_layout.addWidget(self.close_btn)
+            self.submit_btn.close()
+            for i in self.entries:
+                print(i)
+                i.close()
+            self.gif_label.close()
+
+            self.setGeometry(0,0,400,200)
+            self.updateGeometry()
+            self.center()
+
+            pack.do_the_thing()
             # do_the_thing(ip)
+            
         else:
             QMessageBox.warning(self, 'Error', 'All are not valid hex\nEnter only valid hex')
 
@@ -93,6 +126,7 @@ class App(QWidget):
     def close_grace(self):
         reply = QMessageBox.question(self, 'Exit?', 'Do you really want to exit???', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            pack.running = False
             self.close()
 
 

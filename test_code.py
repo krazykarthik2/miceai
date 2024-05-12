@@ -19,10 +19,14 @@ detector = htm.handDetector(maxHands=1)
 wScr, hScr = pyautogui.size()
 isMouseDown = False
 
+running = True
+
+print('global cpl')
 
 def do_the_thing():
+    global running
     global wCam,hCam,frameR,smoothening,cap,detector,wScr,hScr,isMouseDown,pTime,clocX,clocY,plocX,plocY
-    while True:
+    while running:
         fingers = [0, 0, 0, 0, 0]
         success, img = cap.read()
         img = detector.findHands(img)
@@ -34,49 +38,73 @@ def do_the_thing():
         fingers = detector.fingersUp()
         # print(fingers)
         cv2.rectangle(img, (frameR, frameR), (wCam - frameR, hCam - frameR), (255, 0, 255), 2)
-        try:
-            if fingers[1] == 1 and fingers[2] == 0:
-                if isMouseDown:
-                    pyautogui.mouseUp()
-                    isMouseDown = False 
-                
-
-                x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
-                y3 = np.interp(y1, (frameR, hCam - frameR), (0, hScr))
-                clocX = plocX + (x3 - plocX) / smoothening
-                clocY = plocY + (y3 - plocY) / smoothening
-
-
-                pyautogui.moveTo(wScr - clocX, clocY)
-                cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
-                plocX, plocY = clocX, clocY
-                
-            if fingers[1] == 1 and fingers[2] == 1:
-                length, img, lineInfo = detector.findDistance(8, 12, img)
-                if length < 50:
-                    cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
-                    if not isMouseDown:
-                        pyautogui.mouseDown()
-                        isMouseDown = True
-                
-                x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
-                y3 = np.interp(y1, (frameR, hCam - frameR), (0, hScr))
-                clocX = plocX + (x3 - plocX) / smoothening
-                clocY = plocY + (y3 - plocY) / smoothening
-
-
-                pyautogui.moveTo(wScr - clocX, clocY)
-                cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
-                plocX, plocY = clocX, clocY
-
+        print(len(fingers))
+        if not len(fingers)<1:
+            try:
+                if fingers[0]==1 and fingers[1]==0 and fingers[2]==0 and fingers[3]==0 and fingers[4]==0 :
+                    pyautogui.keyDown("Ctrl")
+                    pyautogui.press("C")
+                    pyautogui.keyUp("Ctrl")
+                    print("copied")
+                elif fingers[0]==0 and fingers[1]==1 and fingers[2]==1 and fingers[3]==1 and fingers[4]==1:
+                    pyautogui.keyDown("Ctrl")
+                    pyautogui.press("V")
+                    pyautogui.keyUp("Ctrl")
+                    print("pasted")
+                elif fingers[1] == 1 and fingers[2] == 0 and fingers[3] ==0 and fingers[4]==0:
+                    if isMouseDown:
+                        pyautogui.mouseUp()
+                        isMouseDown = False 
                     
-            else:
-                if isMouseDown:
-                    pyautogui.mouseUp() 
-                    isMouseDown = False 
-                pass #there is more distance between the fingers 1 and 2 
-        except:
-            pass
+
+                    x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
+                    y3 = np.interp(y1, (frameR, hCam - frameR), (0, hScr))
+                    clocX = plocX + (x3 - plocX) / smoothening
+                    clocY = plocY + (y3 - plocY) / smoothening
+
+
+                    pyautogui.moveTo(wScr - clocX, clocY)
+                    cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
+                    plocX, plocY = clocX, clocY
+                    
+                elif fingers[1] == 1 and fingers[2] == 1 and fingers[3]==0 and fingers[4] ==0:
+                    length, img, lineInfo = detector.findDistance(8, 12, img)
+                    if length < 50:
+                        cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                        if not isMouseDown:
+                            pyautogui.mouseDown()
+                            isMouseDown = True
+
+                elif fingers[1]==1 and fingers[2]==1 and fingers[3]==1 and fingers[4]==0:
+
+                    length, img, lineInfo = detector.findDistance(8, 12, img)
+
+                    if length < 50:
+                        # cv2.circle(img, (lineInfo[3] , lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                        if not isMouseDown:
+                            pyautogui.mouseDown()
+                            isMouseDown = True
+                    
+                    x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
+                    y3 = np.interp(y1, (frameR, hCam - frameR), (0, hScr))
+                    clocX = plocX + (x3 - plocX) / smoothening
+                    clocY = plocY + (y3 - plocY) / smoothening
+
+
+                    pyautogui.moveTo(wScr - clocX, clocY)
+                    cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
+                    plocX, plocY = clocX, clocY
+
+                        
+                else:
+                    if isMouseDown:
+                        pyautogui.mouseUp() 
+                        isMouseDown = False 
+                    pass #there is more distance between the fingers 1 and 2 
+            except Exception as e:
+                print(f'exception-{e}')
+            except pyautogui.FailSafeException as e:
+                print(f'at the corners')
         cTime = time.time()
         fps = 1 / (cTime - pTime)
         pTime = cTime
@@ -84,6 +112,10 @@ def do_the_thing():
         cv2.putText(img, str(int(fps))+'fps', (20, 50), cv2.FONT_HERSHEY_PLAIN, 1.2, (200, 200, 0), 3)
         cv2.imshow("Image", img)
         cv2.waitKey(1)
+
 if __name__=='__main__':
+    print('init')
+    
+    pyautogui.FAILSAFE = False
     do_the_thing()
     

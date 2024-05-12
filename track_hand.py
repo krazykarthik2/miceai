@@ -2,8 +2,8 @@ import cv2
 import mediapipe as mp
 import time
 import math
- 
- 
+print('global init')
+
 class handDetector():
     def __init__(self, mode=False, maxHands=1, modelComplexity=1, detectionCon=0.5, trackCon=0.5):
         self.mode = mode
@@ -16,7 +16,7 @@ class handDetector():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
         self.tipIds = [4, 8, 12, 16, 20]
- 
+
     def findHands(self, img, draw=True):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
@@ -25,11 +25,10 @@ class handDetector():
         if self.results.multi_hand_landmarks:
             for handLms in self.results.multi_hand_landmarks:
                 if draw:
-                    self.mpDraw.draw_landmarks(img, handLms,
-                                               self.mpHands.HAND_CONNECTIONS)
+                    self.mpDraw.draw_landmarks(img, handLms,self.mpHands.HAND_CONNECTIONS)
  
         return img
- 
+
     def findPosition(self, img, handNo=0, draw=True):
         xList = []
         yList = []
@@ -53,34 +52,32 @@ class handDetector():
             bbox = xmin, ymin, xmax, ymax
  
             if draw:
-                cv2.rectangle(img, (xmin - 20, ymin - 20), (xmax + 20, ymax + 20),
-                              (0, 255, 0), 2)
+                cv2.rectangle(img, (xmin - 20, ymin - 20), (xmax + 20, ymax + 20),(0, 255, 0), 2)
  
         return self.lmList, bbox
- 
+
     def fingersUp(self):
         fingers = []
         # Thumb
-    
-        try:
-            if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-    
-            # Fingers
-            for id in range(1, 5):
-    
-                if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
+        if not len(self.lmList)<1:
+            try:
+                if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
                     fingers.append(1)
                 else:
                     fingers.append(0)
-        except:
-            pass
-        # totalFingers = fingers.count(1)
- 
+        
+                # Fingers
+                for id in range(1, 5):
+                    if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
+                        fingers.append(1)
+                    else:
+                        fingers.append(0)
+            except Exception as e:
+                print('exception')
+            # totalFingers = fingers.count(1)
+    
         return fingers
- 
+
     def findDistance(self, p1, p2, img, draw=True,r=15, t=3):
         x1, y1 = self.lmList[p1][1:]
         x2, y2 = self.lmList[p2][1:]
@@ -94,12 +91,12 @@ class handDetector():
         length = math.hypot(x2 - x1, y2 - y1)
  
         return length, img, [x1, y1, x2, y2, cx, cy]
- 
- 
+
 def main():
     pTime = 0
     cTime = 0
     cap = cv2.VideoCapture(0)
+    print('capturing video')
     detector = handDetector()
     while True:
         
@@ -119,8 +116,14 @@ def main():
                     (255, 0, 255), 3)
  
         cv2.imshow("Image", img)
-        cv2.waitKey(1)
+        key = cv2.waitKey(1)
+        if(key == 27):
+            break
  
  
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print('exception')
+        print(e)
