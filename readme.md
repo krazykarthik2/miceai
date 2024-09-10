@@ -20,7 +20,13 @@
 - While this has a lot of shaking, I improved smoothing in the program
 - Also, a decent amount of padding is given such that it is easy to move the cursor around while being in the middle of the screen allowing smoother interaction
 
-- # Dependencies
+# Personal Note
+- This project was originally developed to be used with esp32cam, but now is fully software supporting
+- Please raise issue if you have any doubts.
+- Thank you.
+
+ 
+# Dependencies
 
 - numpy
 - opencv-python
