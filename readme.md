@@ -3,6 +3,7 @@
 ## Using your Hand as Cursor
 - Figure out the index finger's position in the output,
     - Make the index finger's position be the cursor's position
+    - Smooth the transition when needed
 - Don't accept 2 hands at a time
 
 ## Figuring out your hand and fingers
