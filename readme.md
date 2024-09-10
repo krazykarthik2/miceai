@@ -1,4 +1,25 @@
-# Dependencies
+
+# How It Works.
+## Using your Hand as Cursor
+- Figure out the index finger's position in the output,
+    - Make the index finger's position be the cursor's position
+- Don't accept 2 hands at a time
+
+## Figuring out your hand and fingers
+- I used mediapipe and mp.hands to figure out the points in hands with models that are in built in media pipe library
+- Then I presented them in a window for debugging
+- Next Figure out the distance between index finger's farthest point and middle finger's farthest point, and ring finger's farthest point
+## Click
+- When the distance between index finger's farthest and middle finger's farthest is lesser than threshold,
+- Register a click while not moving the cursor
+## Dragging
+- When the both index finger and middle finger and ring finger are open , then register a mouse clicking and
+- while also allowing the cursor to move by the position of your index finger
+## Tuning
+- While this has a lot of shaking, I improved smoothing in the program
+- Also, a decent amount of padding is given such that it is easy to move the cursor around while being in the middle of the screen allowing smoother interaction
+
+- # Dependencies
 
 - numpy
 - opencv-python
