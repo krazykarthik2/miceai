@@ -4,12 +4,12 @@ from PyQt5.QtCore import *
 import sys
 import time
 import test_code as pack
-
+import ip_cam as ext_cam
 
 def to_ip(values):
     x = [str(int(y,16)) for y in values]
     ip ='.'.join(x)
-    return 'http://'+ip+'/cam-hi.jpg'
+    return 'http://'+ip+':81/stream'
 
 class HexValidator(QRegExpValidator):
     def __init__(self):
@@ -38,7 +38,7 @@ class App(QWidget):
 
     
     def initUI(self):
-        self.setWindowTitle('mice ai')
+        self.setWindowTitle('MICE AI')
         self.setGeometry(0 , 0, 500, 450)  # x, y, width, height
         self.setStyleSheet('QWidget{ background:#000;color:#fff; }')
         
@@ -99,7 +99,10 @@ class App(QWidget):
         values = [entry.text().upper() for entry in self.entries]
         if all([x for x in values]):
             # QMessageBox.information(self, 'Success', 'All values are valid hex: ' + ', '.join(values))
-            
+            try:
+                ip_is_zero = sum([int(v,16) for v in values])==0 # it will definite give error for valid hex values of ff
+            except ValueError:
+                ip_is_zero = False
             ip = to_ip(values)
             print(ip)
             
@@ -116,8 +119,10 @@ class App(QWidget):
             self.updateGeometry()
             self.center()
 
-            pack.do_the_thing()
-            # do_the_thing(ip)
+            if ip_is_zero:
+                pack.do_the_thing()
+            else:
+                ext_cam.do_the_thing(ip)
             
         else:
             QMessageBox.warning(self, 'Error', 'All are not valid hex\nEnter only valid hex')
@@ -126,6 +131,7 @@ class App(QWidget):
     def close_grace(self):
         reply = QMessageBox.question(self, 'Exit?', 'Do you really want to exit???', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            ext_cam.running = False  
             pack.running = False
             self.close()
 

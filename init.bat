@@ -1,3 +1,3 @@
 @echo off
-pythonw main_new.py
+cd venv/Scripts && activate && cd ../../ && pythonw main_new.py
 exit
